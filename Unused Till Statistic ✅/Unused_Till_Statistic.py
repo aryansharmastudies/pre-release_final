@@ -187,11 +187,12 @@ def TillsBusy(Tills, NoOfTills):
 def OutputStats(Stats, BuyerNumber, SimulationTime, Tills, NoOfTills):
   print("The simulation statistics are:")
   print("==============================")
- 
+# 🚩
   for TillNumber in range(1, NoOfTills + 1):  # remember to start for loop from 1, cause till 0 is still updated in "UpdateTills"
     # so adding it will affect total TIME_UNUSED
     Stats[TIME_UNUSED] += Tills[TillNumber][TIME_IDLE]
   print(f"Average length of time that a till was empty was: {(Stats[TIME_UNUSED])/NoOfTills} time units")
+# 🚩  
   print(f"The maximum queue length was: {Stats[MAX_Q_LENGTH]} buyers")
   print(f"The maximum waiting time was: {Stats[MAX_WAIT]} time units")
   print(f"{BuyerNumber} buyers arrived during {SimulationTime} time units")
