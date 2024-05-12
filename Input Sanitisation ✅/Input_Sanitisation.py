@@ -63,7 +63,7 @@ def ChangeSettings():
         else:
           print(f"Maximum simulation time is {MAX_TIME} time units #2")
       except:
-        print(f"Maximum simulation time is {MAX_TIME} time units #3")
+        print(f"Enter a numeric value #3")
     
     # while SimulationTime > MAX_TIME or SimulationTime < 1:
     #   print(f"Maximum simulation time is {MAX_TIME} time units")
