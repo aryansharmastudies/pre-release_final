@@ -25,6 +25,7 @@ TOTAL_WAIT = 2
 TOTAL_Q = 3
 TOTAL_Q_OCCURRENCE = 4
 TOTAL_NO_WAIT = 5
+TIME_UNUSED = 6
 
 class Q_Node:
   def __init__(self):
@@ -183,9 +184,14 @@ def TillsBusy(Tills, NoOfTills):
     TillNumber += 1
   return IsBusy
 
-def OutputStats(Stats, BuyerNumber, SimulationTime):
+def OutputStats(Stats, BuyerNumber, SimulationTime, Tills, NoOfTills):
   print("The simulation statistics are:")
   print("==============================")
+ 
+  for TillNumber in range(1, NoOfTills + 1):  # remember to start for loop from 1, cause till 0 is still updated in "UpdateTills"
+    # so adding it will affect total TIME_UNUSED
+    Stats[TIME_UNUSED] += Tills[TillNumber][TIME_IDLE]
+  print(f"Average length of time that a till was empty was: {(Stats[TIME_UNUSED])/NoOfTills} time units")
   print(f"The maximum queue length was: {Stats[MAX_Q_LENGTH]} buyers")
   print(f"The maximum waiting time was: {Stats[MAX_WAIT]} time units")
   print(f"{BuyerNumber} buyers arrived during {SimulationTime} time units")
@@ -217,16 +223,16 @@ def QueueSimulator():
   ExtraTime = 0
   while QLength > 0:
     TimeUnit = SimulationTime + ExtraTime
-    print(f"{TimeUnit:>3d}")
+    print(f"ExT: {TimeUnit:>3d}")
     Tills, NoOfTills, BuyerQ, QLength, Stats = Serving(Tills, NoOfTills, BuyerQ, QLength, Stats)
     ExtraTime += 1
   while TillsBusy(Tills, NoOfTills):
     TimeUnit = SimulationTime + ExtraTime
-    print(f"{TimeUnit:>3d}")
+    print(f"ExT: {TimeUnit:>3d}")
     Tills = UpdateTills(Tills, NoOfTills)
     OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength)
     ExtraTime += 1
-  OutputStats(Stats, BuyerNumber, SimulationTime)
+  OutputStats(Stats, BuyerNumber, SimulationTime, Tills, NoOfTills)
 
 if __name__ == "__main__":
   QueueSimulator()
