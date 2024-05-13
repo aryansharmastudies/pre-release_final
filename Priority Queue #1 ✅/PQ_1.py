@@ -91,17 +91,31 @@ def BuyerJoinsQ(Data, BuyerQ, QLength, BuyerNumber):
   BuyerQ[QLength].BuyerID = f"B{BuyerNumber}" # adds buyer right to the end
   BuyerQ[QLength].ItemsInBasket  = ItemsInBasket # adds buyer's items right to the end
 
-  QLength += 1
+  QLength += 1 
 
 
-  for i in range(0, QLength):
-    for j in range(0, QLength - 1):
+  for i in range(0, QLength): 
+    for j in range(0, QLength -i - 1):  # use Qlength -i -1
       # print("###")
       # print(BuyerQ[j].ItemsInBasket, BuyerQ[j+1].ItemsInBasket)
       # print("###")
       if BuyerQ[j].ItemsInBasket < BuyerQ[j+1].ItemsInBasket:
         BuyerQ[j], BuyerQ[j+1] = BuyerQ[j+1], BuyerQ[j]
+        print("SWAP TOOK PLACE!!")
 
+  # 🚩
+  # Run two loops nested in one another.
+  # The outer loop will run from i = 0 to i < n – 1, where n is the number of elements in the list.
+  # The inner loop will run from j = 0 to j < n – i – 1.  
+  # It is because, after each iteration of the outer loop, 
+  # one element at the end (or at the start if the order is decreasing order) 
+  # will be in its right place so we can leave it as it is.
+  # In the inner loop, we will check if the arr[ j ] > arr[ j + 1 ].
+
+  #  If it’s true, then we will swap places of these elements.
+  #  If false, we will continue to the next iteration
+  #  This process will be repeated till the conditions of the loop are satisfied.
+  # 🚩
   
   # DEFAULT OPTION
   # BuyerQ[QLength].BuyerID = f"B{BuyerNumber}" # adds buyer right to the end
