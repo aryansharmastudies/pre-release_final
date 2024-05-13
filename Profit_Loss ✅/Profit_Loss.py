@@ -10,6 +10,8 @@ MAX_Q_SIZE = 30
 MAX_TILLS = 5
 MAX_TIME = 50
 TILL_SPEED = 3
+AVG_PRICE = 1
+RUNNING_COST = 0.2
 
 TIME_IDLE = 0
 TIME_BUSY = 1
@@ -25,6 +27,7 @@ TOTAL_WAIT = 2
 TOTAL_Q = 3
 TOTAL_Q_OCCURRENCE = 4
 TOTAL_NO_WAIT = 5
+TOTAL_ITEMS_SOLD = 6
 
 class Q_Node:
   def __init__(self):
@@ -183,9 +186,25 @@ def TillsBusy(Tills, NoOfTills):
     TillNumber += 1
   return IsBusy
 
-def OutputStats(Stats, BuyerNumber, SimulationTime):
+def OutputStats(Stats, BuyerNumber, SimulationTime, Tills):
+  TotalTimeBusy = 0
+  for i in range (1, len(Tills)):
+    TotalTimeBusy += Tills[i][TIME_BUSY]
+  print("RAW STATISTICS: ")
+  print("================")
+  
+  print(f"Total Time Busy: {TotalTimeBusy}")
+  
+  print(f"Total Number Of Items Sold: {Stats[TOTAL_ITEMS_SOLD]}")
+  
+  print(f"Loss : {TotalTimeBusy * RUNNING_COST}")
+  print(f"Profit via Sales: {Stats[TOTAL_ITEMS_SOLD] * AVG_PRICE}")
+  
   print("The simulation statistics are:")
   print("==============================")
+
+  print(f"🤑 Total Profit: {(Stats[TOTAL_ITEMS_SOLD] * AVG_PRICE) - (TotalTimeBusy * RUNNING_COST)}")
+
   print(f"The maximum queue length was: {Stats[MAX_Q_LENGTH]} buyers")
   print(f"The maximum waiting time was: {Stats[MAX_WAIT]} time units")
   print(f"{BuyerNumber} buyers arrived during {SimulationTime} time units")
@@ -209,6 +228,7 @@ def QueueSimulator():
     print(f"{TimeUnit:>3d}", end='')
     if TimeToNextArrival == 0:
       BuyerNumber += 1
+      Stats[TOTAL_ITEMS_SOLD] += Data[BuyerNumber][ITEMS]
       BuyerQ, QLength, NoOfTills, Stats = BuyerArrives(Data, BuyerQ, QLength, BuyerNumber, NoOfTills, Stats)
       TimeToNextArrival = Data[BuyerNumber + 1][ARRIVAL_TIME]
     else:
@@ -226,7 +246,7 @@ def QueueSimulator():
     Tills = UpdateTills(Tills, NoOfTills)
     OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength)
     ExtraTime += 1
-  OutputStats(Stats, BuyerNumber, SimulationTime)
+  OutputStats(Stats, BuyerNumber, SimulationTime, Tills)
 
 if __name__ == "__main__":
   QueueSimulator()
