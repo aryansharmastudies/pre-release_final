@@ -82,9 +82,32 @@ def OutputHeading():
   print("            |                  |                     |            basket")
  
 def BuyerJoinsQ(Data, BuyerQ, QLength, BuyerNumber):
+  # APPROACH 1
+  # TODO check if the guy who enters has even id
+  # TODO if he has even id. then itterate through list and check where is the last guy with even id.
+  # TODO then move everyone back a space
+  # TODO then insert the bozo - NOTE just override last persons data with new data.
   ItemsInBasket = Data[BuyerNumber][ITEMS]
-  BuyerQ[QLength].BuyerID = f"B{BuyerNumber}"
-  BuyerQ[QLength].ItemsInBasket  = ItemsInBasket
+  
+  index = -1
+  # print(f"Is the Buyer a Clubcard Customer: {even}")
+
+  if BuyerNumber % 2 == 0: # if buyer is clubcard
+    for Buyer in range(0, QLength):
+      if int(BuyerQ[Buyer].BuyerID[1:]) % 2 == 0: 
+        index = Buyer  # find index to insert buyer
+    # print("🟢: ", str(index))
+    if index == -1: # no other clubcard customers found
+      for Buyer in range(QLength, -1, -1):
+        BuyerQ[Buyer + 1].BuyerID = BuyerQ[Buyer].BuyerID
+        BuyerQ[Buyer + 1].ItemsInBasket = BuyerQ[Buyer].ItemsInBasket
+        BuyerQ[Buyer + 1].WaitingTime = BuyerQ[Buyer].WaitingTime
+      BuyerQ[0].BuyerID = BuyerNumber
+      BuyerQ[0].ItemsInBasket = ItemsInBasket
+
+  else:
+    BuyerQ[QLength].BuyerID = f"B{BuyerNumber}"
+    BuyerQ[QLength].ItemsInBasket  = ItemsInBasket
   QLength += 1
   return BuyerQ, QLength
 
@@ -117,7 +140,7 @@ def ServeBuyer(BuyerQ, QLength):
   BuyerQ[QLength].WaitingTime = 0
   BuyerQ[QLength].ItemsInBasket = 0
   QLength -= 1
-  print(f"{ThisBuyerID:>17s}", end='')
+  # print(f"{ThisBuyerID:>17s}", end='')
   return BuyerQ, QLength, ThisBuyerID, ThisBuyerWaitingTime, ThisBuyerItems
 
 def UpdateStats(Stats, WaitingTime):

@@ -83,9 +83,37 @@ def OutputHeading():
  
 def BuyerJoinsQ(Data, BuyerQ, QLength, BuyerNumber):
   ItemsInBasket = Data[BuyerNumber][ITEMS]
-  BuyerQ[QLength].BuyerID = f"B{BuyerNumber}"
-  BuyerQ[QLength].ItemsInBasket  = ItemsInBasket
-  QLength += 1
+  index = 0
+  if BuyerNumber % 2 == 0:
+    print("😳current queue - ")
+    for i in range(0, QLength):
+      print(f"{BuyerQ[i].BuyerID} {BuyerQ[i].ItemsInBasket}")
+      if int(BuyerQ[i].BuyerID[1:]) % 2 == 0:
+        index = i + 1
+    print()
+    print(f"😳index: {index}")  
+  #insert 
+    # print(f"buyer to be moved: {BuyerQ[0].BuyerID} {BuyerQ[0].ItemsInBasket}")
+    print()
+    print("😳queue length: ", QLength)
+    for buyer in range(QLength - 1, index - 1, -1):
+      BuyerQ[buyer + 1].BuyerID = BuyerQ[buyer].BuyerID
+      BuyerQ[buyer + 1].ItemsInBasket = BuyerQ[buyer].ItemsInBasket
+      BuyerQ[buyer + 1].WaitingTime = BuyerQ[buyer].WaitingTime
+    BuyerQ[index].BuyerID = f"B{BuyerNumber}"
+    BuyerQ[index].ItemsInBasket  = ItemsInBasket
+      
+    QLength += 1
+    
+    print()
+    print("😳current updated queue - ")
+    for i in range(0, QLength):
+      print(f"{BuyerQ[i].BuyerID} {BuyerQ[i].ItemsInBasket}")
+  else: 
+  # ItemsInBasket = Data[BuyerNumber][ITEMS]
+    BuyerQ[QLength].BuyerID = f"B{BuyerNumber}"
+    BuyerQ[QLength].ItemsInBasket  = ItemsInBasket
+    QLength += 1
   return BuyerQ, QLength
 
 def BuyerArrives(Data, BuyerQ, QLength, BuyerNumber, NoOfTills, Stats):
