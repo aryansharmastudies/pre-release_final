@@ -129,7 +129,10 @@ def UpdateStats(Stats, WaitingTime):
   return Stats
 
 def CalculateServingTime(Tills, ThisTill, NoOfItems):
-  ServingTime = (NoOfItems // TILL_SPEED) + 1
+  if ThisTill == 1:
+    ServingTime = (NoOfItems // 6) + 1
+  else:
+    ServingTime = (NoOfItems // TILL_SPEED) + 1
   Tills[ThisTill][TIME_SERVING] = ServingTime
   print(f"{ThisTill:>6d}{ServingTime:>6d}")
   return Tills
