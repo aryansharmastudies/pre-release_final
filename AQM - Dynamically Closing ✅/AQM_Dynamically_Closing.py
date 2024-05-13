@@ -139,14 +139,32 @@ def IncrementTimeWaiting(BuyerQ, QLength):
     BuyerQ[Count].WaitingTime += 1
   return BuyerQ
 
-def UpdateTills(Tills, NoOfTills):
+def UpdateTills(Tills, NoOfTills, IdleTills):
+  print("🟡 IDLE TILLS BEFORE: ")
+  print(IdleTills)
+
   for TillNumber in range(NoOfTills + 1):
     if Tills[TillNumber][TIME_SERVING] == 0:
       Tills[TillNumber][TIME_IDLE] += 1
     else:
       Tills[TillNumber][TIME_BUSY] += 1
       Tills[TillNumber][TIME_SERVING] -= 1
-  return Tills
+
+  for i in range(1, NoOfTills + 1):
+    if Tills[i][TIME_SERVING] == 0: 
+      IdleTills[i][1] += 1
+      print(f"🚩 TILL {i} HAD TIME_SERVING == 0")
+      print()
+      if IdleTills[i][1] == 2 and NoOfTills > 1:
+        print(f"😳😳😳CLOSE TILL {i}")
+        NoOfTills -= 1
+    else: # time serving != 0 i.e. till is serving
+      IdleTills[i][1] = 0
+
+  print("🟢 IDLE TILLS AFTER: ")
+  print(IdleTills)
+
+  return Tills, NoOfTills, IdleTills
 
 def OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength):
   for i in range(1, NoOfTills + 1):
@@ -157,7 +175,7 @@ def OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength):
   print("                                                    *** End of queue ***")
   print("------------------------------------------------------------------------")
 
-def Serving(Tills, NoOfTills, BuyerQ, QLength, Stats):
+def Serving(Tills, NoOfTills, BuyerQ, QLength, Stats, IdleTills):
   TillFree = FindFreeTill(Tills, NoOfTills)
   while TillFree != -1 and QLength > 0:
     BuyerQ, QLength, BuyerID, WaitingTime, ItemsInBasket = ServeBuyer(BuyerQ, QLength)
@@ -165,14 +183,14 @@ def Serving(Tills, NoOfTills, BuyerQ, QLength, Stats):
     Tills = CalculateServingTime(Tills, TillFree, ItemsInBasket)
     TillFree = FindFreeTill(Tills, NoOfTills)
   BuyerQ = IncrementTimeWaiting(BuyerQ, QLength)
-  Tills = UpdateTills(Tills, NoOfTills)
+  Tills, NoOfTills, IdleTills = UpdateTills(Tills, NoOfTills, IdleTills)
   if QLength > 0:
     Stats[TOTAL_Q_OCCURRENCE] += 1 
     Stats[TOTAL_Q] += QLength 
   if QLength > Stats[MAX_Q_LENGTH]:
     Stats[MAX_Q_LENGTH] = QLength 
   OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength)
-  return  Tills, NoOfTills, BuyerQ, QLength, Stats
+  return  Tills, NoOfTills, BuyerQ, QLength, Stats, IdleTills
 
 def TillsBusy(Tills, NoOfTills):
   IsBusy = False
@@ -202,6 +220,12 @@ def QueueSimulator():
   Stats, Tills, BuyerQ = ResetDataStructures()
   SimulationTime, NoOfTills = ChangeSettings()
   Data = ReadInSimulationData()
+  IdleTills = list()
+  for i in range(0, NoOfTills+1):
+    TillName = "T" + str(i)
+    IdleTills.append([TillName,0])
+  # print("###")
+  # print(Idle_Tills)
   OutputHeading()
   TimeToNextArrival = Data[BuyerNumber + 1][ARRIVAL_TIME]
   for TimeUnit in range(SimulationTime):
@@ -213,17 +237,17 @@ def QueueSimulator():
       TimeToNextArrival = Data[BuyerNumber + 1][ARRIVAL_TIME]
     else:
       print()
-    Tills, NoOfTills, BuyerQ, QLength, Stats = Serving(Tills, NoOfTills, BuyerQ, QLength, Stats)
+    Tills, NoOfTills, BuyerQ, QLength, Stats, IdleTills = Serving(Tills, NoOfTills, BuyerQ, QLength, Stats, IdleTills)
   ExtraTime = 0
   while QLength > 0:
     TimeUnit = SimulationTime + ExtraTime
     print(f"{TimeUnit:>3d}")
-    Tills, NoOfTills, BuyerQ, QLength, Stats = Serving(Tills, NoOfTills, BuyerQ, QLength, Stats)
+    Tills, NoOfTills, BuyerQ, QLength, Stats, IdleTills = Serving(Tills, NoOfTills, BuyerQ, QLength, Stats, IdleTills)
     ExtraTime += 1
   while TillsBusy(Tills, NoOfTills):
     TimeUnit = SimulationTime + ExtraTime
     print(f"{TimeUnit:>3d}")
-    Tills = UpdateTills(Tills, NoOfTills)
+    Tills, NoOfTills, IdleTills = UpdateTills(Tills, NoOfTills, IdleTills)
     OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength)
     ExtraTime += 1
   OutputStats(Stats, BuyerNumber, SimulationTime)
