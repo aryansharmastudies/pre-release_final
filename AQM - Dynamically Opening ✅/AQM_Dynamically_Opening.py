@@ -183,7 +183,7 @@ def Serving(Tills, NoOfTills, BuyerQ, QLength, Stats):
 
   BuyerQ = IncrementTimeWaiting(BuyerQ, QLength)
   Tills = UpdateTills(Tills, NoOfTills)
-
+  # this will go after UpdateTills otherwise the new till will be updated as IDLE + 1.
   if TillFree == -1 and QLength > 1 and NoOfTills != 5 : 
     print("🚩 new till created!")
     NoOfTills += 1 
