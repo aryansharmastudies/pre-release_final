@@ -96,7 +96,7 @@ def BuyerJoinsQ(Data, BuyerQ, QLength, BuyerNumber):
     for Buyer in range(0, QLength):
       if int(BuyerQ[Buyer].BuyerID[1:]) % 2 == 0: 
         index = Buyer  # find index to insert buyer
-    # print("🟢: ", str(index))
+    print("🟢: ", str(index))
     if index == -1: # no other clubcard customers found
       for Buyer in range(QLength, -1, -1):
         BuyerQ[Buyer + 1].BuyerID = BuyerQ[Buyer].BuyerID
@@ -140,7 +140,7 @@ def ServeBuyer(BuyerQ, QLength):
   BuyerQ[QLength].WaitingTime = 0
   BuyerQ[QLength].ItemsInBasket = 0
   QLength -= 1
-  # print(f"{ThisBuyerID:>17s}", end='')
+  print(f"{ThisBuyerID:>17s}", end='')
   return BuyerQ, QLength, ThisBuyerID, ThisBuyerWaitingTime, ThisBuyerItems
 
 def UpdateStats(Stats, WaitingTime):

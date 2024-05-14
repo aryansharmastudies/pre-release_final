@@ -1,0 +1,25 @@
+The question goes something like this: 
+- Well the first thing is that you run the program(the main function) "n" number of times modifying the simulation time and number of tills.
+- Then you find the "best" number of tills, for a given time.
+  - This is done by comparing the average queue length for number of tills from 1-5 given a time period.
+  - e.g. running the simulation for 35 time frames, we itterate through NoOfTills from 1-5, trying to find the one with least "average queue length".
+  - If it's already not obvious enough(which it isn't), the number of tills = 5 is going to be the "best".
+
+Twist: 
+- However, adding a twist to the question, what if we introduce profit and loss.
+- In essence, we make it such that running each till(whether it be idle or working), it will cost 0.2(or some other amount) per time frame.
+  - Now, quite clearly, opening 5 number of tills isn't going to be the most optimized, as, though they will able to help serve buyers more quicker, 
+  they will also sit idle.
+    - This will increase the price of running the tills cumulatively.
+
+cURRENT StaTE: 
+- Currently, we have a program that find's total number of items buyer buys, multiplies it with 1(cost of item)
+- then, finds total number of time running of the machines, and multiplies it by fixed rate of 0.2.
+  - finally subtracts cost of running from total income to get profit.
+
+- We have to change it such that, it will now calculate the total number of time frames that the tills are idle/working for.
+- Then simply find the profit.
+
+Goal: 
+- Ultimately.
+- compare average queue length and profit. Find the most optimal i.e. highest profit gained and lowest queue length.

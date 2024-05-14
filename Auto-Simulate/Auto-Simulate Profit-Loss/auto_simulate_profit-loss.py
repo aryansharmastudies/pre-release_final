@@ -25,6 +25,12 @@ TOTAL_WAIT = 2
 TOTAL_Q = 3
 TOTAL_Q_OCCURRENCE = 4
 TOTAL_NO_WAIT = 5
+PROFIT = 6
+WORKNIG_TIME = 7
+
+# costs
+ITEM_COST = 1
+TILL_COST = 0.2
 
 class Q_Node:
   def __init__(self):
@@ -38,28 +44,28 @@ def ResetDataStructures():
   BuyerQ = [Q_Node() for i in range(MAX_Q_SIZE)]
   return Stats, Tills, BuyerQ
 
-# def ChangeSettings():
-#   SimulationTime = 10
-#   NoOfTills = 2
-#   print("Settings set for this simulation:")
-#   print("=================================")
-#   print(f"Simulation time: {SimulationTime}")
-#   print(f"Tills operating: {NoOfTills}")
-#   print("=================================")
-#   print()
-#   Answer = input("Do you wish to change the settings?  Y/N: ")
-#   if Answer == 'Y':
-#     print(f"Maximum simulation time is {MAX_TIME} time units")
-#     SimulationTime = int(input("Simulation run time: "))
-#     while SimulationTime > MAX_TIME or SimulationTime < 1:
-#       print(f"Maximum simulation time is {MAX_TIME} time units")
-#       SimulationTime = int(input("Simulation run time: "))
-#     print(f"Maximum number of tills is {MAX_TILLS}")
-#     NoOfTills = int(input("Number of tills in use: "))
-#     while NoOfTills > MAX_TILLS or NoOfTills < 1:
-#       print(f"Maximum number of tills is {MAX_TILLS}")
-#       NoOfTills = int(input("Number of tills in use: "))
-#   return SimulationTime, NoOfTills
+def ChangeSettings():
+  SimulationTime = 10
+  NoOfTills = 2
+  print("Settings set for this simulation:")
+  print("=================================")
+  print(f"Simulation time: {SimulationTime}")
+  print(f"Tills operating: {NoOfTills}")
+  print("=================================")
+  print()
+  Answer = input("Do you wish to change the settings?  Y/N: ")
+  if Answer == 'Y':
+    print(f"Maximum simulation time is {MAX_TIME} time units")
+    SimulationTime = int(input("Simulation run time: "))
+    while SimulationTime > MAX_TIME or SimulationTime < 1:
+      print(f"Maximum simulation time is {MAX_TIME} time units")
+      SimulationTime = int(input("Simulation run time: "))
+    print(f"Maximum number of tills is {MAX_TILLS}")
+    NoOfTills = int(input("Number of tills in use: "))
+    while NoOfTills > MAX_TILLS or NoOfTills < 1:
+      print(f"Maximum number of tills is {MAX_TILLS}")
+      NoOfTills = int(input("Number of tills in use: "))
+  return SimulationTime, NoOfTills
 
 def ReadInSimulationData():
   Data = [[0, 0] for i in range(MAX_TIME + 1)]
@@ -74,12 +80,12 @@ def ReadInSimulationData():
   FileIn.close()
   return Data
 
-# def OutputHeading():
-#   print()
-#   print("Time Buyer  | Start Till Serve | Till Time Time Time |      Queue")
-#   print("     enters | serve      time  | num- idle busy ser- | Buyer Wait Items")
-#   print("     (items)| buyer            | ber            ving | ID    time in")
-#   print("            |                  |                     |            basket")
+def OutputHeading():
+  print()
+  print("Time Buyer  | Start Till Serve | Till Time Time Time |      Queue")
+  print("     enters | serve      time  | num- idle busy ser- | Buyer Wait Items")
+  print("     (items)| buyer            | ber            ving | ID    time in")
+  print("            |                  |                     |            basket")
  
 def BuyerJoinsQ(Data, BuyerQ, QLength, BuyerNumber):
   ItemsInBasket = Data[BuyerNumber][ITEMS]
@@ -88,10 +94,11 @@ def BuyerJoinsQ(Data, BuyerQ, QLength, BuyerNumber):
   QLength += 1
   return BuyerQ, QLength
 
-def BuyerArrives(Data, BuyerQ, QLength, BuyerNumber, NoOfTills, Stats):
+def BuyerArrives(Data, BuyerQ, QLength, BuyerNumber, NoOfTills, Stats, Sale):
   # print(f"  B{BuyerNumber}({Data[BuyerNumber][ITEMS]})")
   BuyerQ, QLength = BuyerJoinsQ(Data, BuyerQ, QLength, BuyerNumber)
-  return BuyerQ, QLength, NoOfTills, Stats
+  Sale += Data[BuyerNumber][ITEMS] * ITEM_COST
+  return BuyerQ, QLength, NoOfTills, Stats, Sale
 
 def FindFreeTill(Tills, NoOfTills):
   FoundFreeTill = False
@@ -148,14 +155,14 @@ def UpdateTills(Tills, NoOfTills):
       Tills[TillNumber][TIME_SERVING] -= 1
   return Tills
 
-# def OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength):
-#   for i in range(1, NoOfTills + 1):
-#     print(f"{i:>36d}{Tills[i][TIME_IDLE]:>5d}{Tills[i][TIME_BUSY]:>5d}{Tills[i][TIME_SERVING]:>6d}")
-#   print("                                                    ** Start of queue **")
-#   for i in range(QLength):
-#     print(f"{BuyerQ[i].BuyerID:>57s}{BuyerQ[i].WaitingTime:>7d}{BuyerQ[i].ItemsInBasket:>6d}")
-#   print("                                                    *** End of queue ***")
-#   print("------------------------------------------------------------------------")
+def OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength):
+  for i in range(1, NoOfTills + 1):
+    print(f"{i:>36d}{Tills[i][TIME_IDLE]:>5d}{Tills[i][TIME_BUSY]:>5d}{Tills[i][TIME_SERVING]:>6d}")
+  print("                                                    ** Start of queue **")
+  for i in range(QLength):
+    print(f"{BuyerQ[i].BuyerID:>57s}{BuyerQ[i].WaitingTime:>7d}{BuyerQ[i].ItemsInBasket:>6d}")
+  print("                                                    *** End of queue ***")
+  print("------------------------------------------------------------------------")
 
 def Serving(Tills, NoOfTills, BuyerQ, QLength, Stats):
   TillFree = FindFreeTill(Tills, NoOfTills)
@@ -171,7 +178,7 @@ def Serving(Tills, NoOfTills, BuyerQ, QLength, Stats):
     Stats[TOTAL_Q] += QLength 
   if QLength > Stats[MAX_Q_LENGTH]:
     Stats[MAX_Q_LENGTH] = QLength 
-  # OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength)
+  # OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength)
   return  Tills, NoOfTills, BuyerQ, QLength, Stats
 
 def TillsBusy(Tills, NoOfTills):
@@ -183,7 +190,12 @@ def TillsBusy(Tills, NoOfTills):
     TillNumber += 1
   return IsBusy
 
-def OutputStats(Stats, BuyerNumber, SimulationTime):
+def OutputStats(Stats, BuyerNumber, SimulationTime, Tills, NoOfTills):
+  Total_time_working = 0  #🟢
+  for x in range(1, NoOfTills + 1): #🟢
+    Total_time_working += Tills[x][TIME_BUSY] #🟢
+    Total_time_working += Tills[x][TIME_IDLE] #🟢 finds total number of time for which till is ON.
+    # used to find the total number of time units all tills cumulatively worked!
   # print("The simulation statistics are:")
   # print("==============================")
   # print(f"The maximum queue length was: {Stats[MAX_Q_LENGTH]} buyers")
@@ -191,18 +203,22 @@ def OutputStats(Stats, BuyerNumber, SimulationTime):
   # print(f"{BuyerNumber} buyers arrived during {SimulationTime} time units")
   # AverageWaitingTime = round(Stats[TOTAL_WAIT] / BuyerNumber, 1)
   # print(f"The average waiting time was: {AverageWaitingTime} time units")
+  print(f"😊 Profit: {Stats[PROFIT] - (0.2 * Total_time_working)}") #🟢 # times it by 0.2 and subtract by money made selling all items
   if Stats[TOTAL_Q_OCCURRENCE] > 0:
     AverageQLength = round(Stats[TOTAL_Q] / Stats[TOTAL_Q_OCCURRENCE], 2)
     print(f"The average queue length was: {AverageQLength} buyers")
-  else:
-    print(f"The average queue length was: 0 buyers")
+  else: 
+    print("No queue length")
+  print()
   # print(f"{Stats[TOTAL_NO_WAIT]} buyers did not need to queue")
 
-def QueueSimulator(time, tills):
+def QueueSimulator(SimulationTime, NoOfTills):
   BuyerNumber = 0
   QLength = 0
+  Sale = 0
+  Working_Time = 0
   Stats, Tills, BuyerQ = ResetDataStructures()
-  SimulationTime, NoOfTills = time, tills
+  # SimulationTime, NoOfTills = ChangeSettings()
   Data = ReadInSimulationData()
   # OutputHeading()
   TimeToNextArrival = Data[BuyerNumber + 1][ARRIVAL_TIME]
@@ -211,13 +227,14 @@ def QueueSimulator(time, tills):
     # print(f"{TimeUnit:>3d}", end='')
     if TimeToNextArrival == 0:
       BuyerNumber += 1
-      BuyerQ, QLength, NoOfTills, Stats = BuyerArrives(Data, BuyerQ, QLength, BuyerNumber, NoOfTills, Stats)
+      BuyerQ, QLength, NoOfTills, Stats, Sale = BuyerArrives(Data, BuyerQ, QLength, BuyerNumber, NoOfTills, Stats, Sale)
       TimeToNextArrival = Data[BuyerNumber + 1][ARRIVAL_TIME]
     else:
       pass
-      # print()
+      # print()
     Tills, NoOfTills, BuyerQ, QLength, Stats = Serving(Tills, NoOfTills, BuyerQ, QLength, Stats)
-  ExtraTime = 0
+  Stats[PROFIT] = Sale
+  ExtraTime = 0  # note: in extra times, no new people join the queue. Hence, we don't need to incoorperate a function which adds number of items buyer buys.
   while QLength > 0:
     TimeUnit = SimulationTime + ExtraTime
     # print(f"{TimeUnit:>3d}")
@@ -229,12 +246,17 @@ def QueueSimulator(time, tills):
     Tills = UpdateTills(Tills, NoOfTills)
     # OutputTillAndQueueStates(Tills, NoOfTills, BuyerQ, QLength)
     ExtraTime += 1
-  OutputStats(Stats, BuyerNumber, SimulationTime)
+  OutputStats(Stats, BuyerNumber, SimulationTime, Tills, NoOfTills)
 
 if __name__ == "__main__":
-  
-  for time in range(1, 51):
-    for tills in range(1,6): 
-      print(f"Time: {time} Tills: {tills}")
-      QueueSimulator(time, tills)
+  for Time in range(1,51):
+    for Tills in range(1,6):
+      # print("##########")
+      print(f"time: {Time} tills: {Tills}")
+      # print("##########")
+      QueueSimulator(Time, Tills)  # this works. but ends up printing long list of all simulations.
   input("Press Enter to finish")
+  # we want a way for this queue simulator to run incrementing each time it's simulation time and number of tills.
+  # we can do this by passing in parameters of SimulationTime and NoOfTills
+  # clearly we can see that the "best" number of tills is 5 number of tills.
+  # however, it gets interesting when there is profit and loss.

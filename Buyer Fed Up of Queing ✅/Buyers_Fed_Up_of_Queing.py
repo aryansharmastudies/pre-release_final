@@ -134,12 +134,13 @@ def CalculateServingTime(Tills, ThisTill, NoOfItems):
   print(f"{ThisTill:>6d}{ServingTime:>6d}")
   return Tills
 
+# 🚩
 def IncrementTimeWaiting(BuyerQ, QLength):
   print(f"Qlength: {QLength}") 
   for Count in range(QLength):
     BuyerQ[Count].WaitingTime += 1
     if BuyerQ[Count].WaitingTime == 3:
-      print("Buyer Fed Up")
+      print(f"{BuyerQ[Count].BuyerID} Buyer Fed Up")
 
       for i in range(0, QLength - 1):
         BuyerQ[i].BuyerID = BuyerQ[i + 1].BuyerID
